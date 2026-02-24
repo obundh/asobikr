@@ -1,0 +1,103 @@
+﻿<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e5f55" />
+    <title>iknowur MVP</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">Everyday Prediction Party</p>
+        <h1>iknowur</h1>
+        <p>문장 5개를 먼저 커밋하고, 실제 행동이 나오면 공개해서 점수를 가져가세요.</p>
+      </header>
+
+      <section class="panel auth-card" id="auth-panel">
+        <h2>시작하기</h2>
+        <label class="field-label" for="name-input">닉네임</label>
+        <input id="name-input" maxlength="24" placeholder="예: 도현" />
+
+        <div class="auth-actions">
+          <button id="create-party-btn">새 파티 만들기</button>
+
+          <div class="join-wrap">
+            <input id="party-code-input" maxlength="6" placeholder="파티 코드 6자리" />
+            <button id="join-party-btn" class="ghost">코드로 참가</button>
+          </div>
+        </div>
+
+        <p class="hint">모든 멤버가 예측 5개를 제출하면 파티가 활성화되고 추가 참가가 잠깁니다.</p>
+      </section>
+
+      <section class="panel party-card hidden" id="party-panel">
+        <div class="party-overview">
+          <div>
+            <p class="eyebrow">현재 파티</p>
+            <h2 id="party-code">------</h2>
+            <p id="party-meta" class="hint"></p>
+          </div>
+          <div class="party-tools">
+            <button id="copy-code-btn" class="ghost">코드 복사</button>
+            <button id="refresh-btn" class="ghost">새로고침</button>
+            <button id="leave-party-btn" class="ghost">파티 나가기</button>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <article class="stat-card">
+            <p>멤버</p>
+            <strong id="stat-members">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>제출 완료</p>
+            <strong id="stat-submitted">0</strong>
+          </article>
+          <article class="stat-card">
+            <p>열린 Claim</p>
+            <strong id="stat-open-claims">0</strong>
+          </article>
+        </div>
+
+        <nav class="tab-nav" id="tab-nav">
+          <button class="tab-btn is-active" data-tab="status">상태</button>
+          <button class="tab-btn" data-tab="predict">예측</button>
+          <button class="tab-btn" data-tab="claims">클레임</button>
+          <button class="tab-btn" data-tab="log">로그</button>
+        </nav>
+
+        <section class="tab-panel" data-panel="status">
+          <h3>멤버 / 점수</h3>
+          <ul id="members-list" class="list"></ul>
+        </section>
+
+        <section class="tab-panel hidden" data-panel="predict">
+          <h3>내 예측 제출</h3>
+          <p id="prediction-progress" class="hint"></p>
+          <form id="prediction-form" class="prediction-form"></form>
+          <button id="submit-predictions-btn" class="primary-action hidden">예측 5개 암호화 제출</button>
+          <p id="prediction-status" class="hint"></p>
+        </section>
+
+        <section class="tab-panel hidden" data-panel="claims">
+          <h3>내 Claim</h3>
+          <div id="claim-box" class="stack"></div>
+          <h3>Claims</h3>
+          <ul id="claims-list" class="list"></ul>
+        </section>
+
+        <section class="tab-panel hidden" data-panel="log">
+          <h3>로그</h3>
+          <ul id="log-list" class="list compact"></ul>
+        </section>
+      </section>
+    </main>
+
+    <div id="notice" class="notice hidden" aria-live="polite"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
