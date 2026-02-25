@@ -9,13 +9,14 @@ const DATA_DIR = path.join(__dirname, "data");
 const STORE_FILE = path.join(DATA_DIR, "store.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const IS_SERVERLESS = Boolean(process.env.VERCEL);
-let useFileStore = !IS_SERVERLESS;
+const IS_DIRECT_RUN = require.main === module;
+let useFileStore = IS_DIRECT_RUN && !IS_SERVERLESS;
 
 const app = express();
 let server = null;
 let io = null;
 
-if (!IS_SERVERLESS) {
+if (IS_DIRECT_RUN && !IS_SERVERLESS) {
   const { Server } = require("socket.io");
   server = http.createServer(app);
   io = new Server(server);
@@ -548,7 +549,7 @@ app.get("*", (_req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, "index.html"));
 });
 
-if (require.main === module && server) {
+if (IS_DIRECT_RUN && server) {
   server.listen(PORT, () => {
     console.log(`iknowur MVP listening on http://localhost:${PORT}`);
   });
