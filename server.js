@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const http = require("http");
 const path = require("path");
 const fs = require("fs");
@@ -9,10 +9,17 @@ const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, "data");
 const STORE_FILE = path.join(DATA_DIR, "store.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
+const IS_SERVERLESS = Boolean(process.env.VERCEL);
+const USE_FILE_STORE = !IS_SERVERLESS;
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+let server = null;
+let io = null;
+
+if (!IS_SERVERLESS) {
+  server = http.createServer(app);
+  io = new Server(server);
+}
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(PUBLIC_DIR));
@@ -20,6 +27,13 @@ app.use(express.static(PUBLIC_DIR));
 const store = loadStore();
 
 function loadStore() {
+  if (!USE_FILE_STORE) {
+    if (!globalThis.__IKNOWUR_MEMORY_STORE__) {
+      globalThis.__IKNOWUR_MEMORY_STORE__ = { parties: {} };
+    }
+    return globalThis.__IKNOWUR_MEMORY_STORE__;
+  }
+
   fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(STORE_FILE)) {
     const initial = { parties: {} };
@@ -41,6 +55,11 @@ function loadStore() {
 }
 
 function saveStore() {
+  if (!USE_FILE_STORE) {
+    globalThis.__IKNOWUR_MEMORY_STORE__ = store;
+    return;
+  }
+
   fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2), "utf8");
 }
 
@@ -208,6 +227,10 @@ function sanitizePartyForViewer(party, viewerId) {
 }
 
 function emitPartyChanged(partyId) {
+  if (!io) {
+    return;
+  }
+
   io.to(`party:${partyId}`).emit("partyChanged", { partyId, at: now() });
 }
 
@@ -491,14 +514,16 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, at: now() });
 });
 
-io.on("connection", (socket) => {
-  socket.on("joinParty", ({ partyId } = {}) => {
-    if (!partyId || !store.parties[partyId]) {
-      return;
-    }
-    socket.join(`party:${partyId}`);
+if (io) {
+  io.on("connection", (socket) => {
+    socket.on("joinParty", ({ partyId } = {}) => {
+      if (!partyId || !store.parties[partyId]) {
+        return;
+      }
+      socket.join(`party:${partyId}`);
+    });
   });
-});
+}
 
 app.get("/iknowur", (_req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, "iknowur", "index.html"));
@@ -512,6 +537,10 @@ app.get("*", (_req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, "index.html"));
 });
 
-server.listen(PORT, () => {
-  console.log(`iknowur MVP listening on http://localhost:${PORT}`);
-});
+if (require.main === module && server) {
+  server.listen(PORT, () => {
+    console.log(`iknowur MVP listening on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

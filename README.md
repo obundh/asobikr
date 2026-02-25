@@ -19,6 +19,12 @@ npm start
 
 브라우저에서 `http://localhost:3000` 접속
 
+## Vercel 배포 참고
+
+- `vercel.json` + `api/index.js`로 API를 서버리스 함수로 라우팅합니다.
+- Vercel에서는 파일시스템 쓰기가 제한되어 `data/store.json` 대신 메모리 저장소를 사용합니다.
+- 이 때문에 Vercel 배포본은 함수 재시작 시 파티 데이터가 사라질 수 있습니다.
+
 ## 라우트
 
 - `/` : 게임 허브 홈 (iknowur / gussmymbti 버튼)

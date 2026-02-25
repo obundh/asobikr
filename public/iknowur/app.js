@@ -1,9 +1,10 @@
-﻿const state = {
+const state = {
   playerId: getOrCreatePlayerId(),
   name: localStorage.getItem("iknowur_name") || "",
   partyId: localStorage.getItem("iknowur_party_id") || "",
   party: null,
   socket: null,
+  pollTimer: null,
   activeTab: localStorage.getItem("iknowur_active_tab") || "status",
   noticeTimer: null,
 };
@@ -129,6 +130,7 @@ function requireName() {
 }
 
 function clearPartySession() {
+  stopRealtimeSync();
   state.party = null;
   state.partyId = "";
   localStorage.removeItem("iknowur_party_id");
@@ -232,8 +234,15 @@ function connectSocket() {
     return;
   }
 
+  if (typeof window.io !== "function") {
+    startPolling();
+    return;
+  }
+
+  stopPolling();
+
   if (!state.socket) {
-    state.socket = io();
+    state.socket = window.io();
     state.socket.on("partyChanged", (payload) => {
       if (!payload || payload.partyId !== state.partyId) {
         return;
@@ -243,6 +252,41 @@ function connectSocket() {
   }
 
   state.socket.emit("joinParty", { partyId: state.partyId });
+}
+
+function startPolling() {
+  if (state.pollTimer || !state.partyId) {
+    return;
+  }
+
+  state.pollTimer = setInterval(() => {
+    fetchParty();
+  }, 5000);
+}
+
+function stopPolling() {
+  if (!state.pollTimer) {
+    return;
+  }
+
+  clearInterval(state.pollTimer);
+  state.pollTimer = null;
+}
+
+function stopRealtimeSync() {
+  stopPolling();
+
+  if (!state.socket) {
+    return;
+  }
+
+  try {
+    state.socket.disconnect();
+  } catch (_err) {
+    // no-op
+  }
+
+  state.socket = null;
 }
 
 function leaveParty() {
