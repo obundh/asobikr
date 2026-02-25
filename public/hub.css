@@ -1,0 +1,134 @@
+﻿:root {
+  --ink: #1a2026;
+  --muted: #5a6571;
+  --panel: #ffffff;
+  --line: #d8e2ef;
+  --accent-a: #0c4f88;
+  --accent-b: #0f8c7f;
+  --shadow: 0 16px 50px rgba(11, 39, 61, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--ink);
+  font-family: "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 0% 0%, #ffd7a8 0, transparent 34%),
+    radial-gradient(circle at 100% 100%, #bce8e2 0, transparent 42%),
+    #eef4f9;
+}
+
+.hub-shell {
+  width: min(1040px, 94vw);
+  margin: 0 auto;
+  padding: 26px 0 40px;
+}
+
+.hero {
+  padding: 8px 4px 12px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #0a5c95;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+
+.hero h1 {
+  margin: 8px 0 0;
+  font-size: clamp(28px, 5.4vw, 46px);
+  line-height: 1.08;
+}
+
+.hero p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: clamp(15px, 2.8vw, 19px);
+}
+
+.game-grid {
+  margin-top: 16px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+.game-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.game-card .tag {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #1f5f93;
+}
+
+.game-card h2 {
+  margin: 8px 0 0;
+  font-size: clamp(24px, 4.5vw, 34px);
+}
+
+.game-card p {
+  margin: 10px 0 0;
+  color: #4b5662;
+  line-height: 1.5;
+}
+
+.game-card.iknowur {
+  background:
+    linear-gradient(130deg, #ecf9f6 0%, #fff 52%),
+    #fff;
+}
+
+.game-card.mbti {
+  background:
+    linear-gradient(130deg, #ebf1ff 0%, #fff 52%),
+    #fff;
+}
+
+.cta {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+}
+
+.cta:hover {
+  filter: brightness(1.05);
+}
+
+@media (min-width: 860px) {
+  .hub-shell {
+    padding-top: 36px;
+  }
+
+  .game-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+}

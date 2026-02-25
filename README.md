@@ -19,6 +19,12 @@ npm start
 
 브라우저에서 `http://localhost:3000` 접속
 
+## 라우트
+
+- `/` : 게임 허브 홈 (iknowur / gussmymbti 버튼)
+- `/iknowur` : iknowur 게임
+- `/gussmymbti` : gussmymbti 빌드 앱
+
 ## 모바일 UX 포인트
 
 - 모바일 우선 레이아웃
