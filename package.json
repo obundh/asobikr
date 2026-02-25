@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "iknowur MVP - encrypted prediction party game",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node app.js",
+    "dev": "node app.js"
   },
   "dependencies": {
     "express": "^4.21.2",

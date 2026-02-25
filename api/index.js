@@ -1,7 +1,7 @@
 let app;
 
 try {
-  app = require("../server");
+  app = require("../app");
 } catch (err) {
   console.error("server bootstrap failed:", err);
   app = (_req, res) => {
