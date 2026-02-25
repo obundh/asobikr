@@ -3,20 +3,20 @@ const http = require("http");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const { Server } = require("socket.io");
 
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, "data");
 const STORE_FILE = path.join(DATA_DIR, "store.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const IS_SERVERLESS = Boolean(process.env.VERCEL);
-const USE_FILE_STORE = !IS_SERVERLESS;
+let useFileStore = !IS_SERVERLESS;
 
 const app = express();
 let server = null;
 let io = null;
 
 if (!IS_SERVERLESS) {
+  const { Server } = require("socket.io");
   server = http.createServer(app);
   io = new Server(server);
 }
@@ -27,21 +27,21 @@ app.use(express.static(PUBLIC_DIR));
 const store = loadStore();
 
 function loadStore() {
-  if (!USE_FILE_STORE) {
+  if (!useFileStore) {
     if (!globalThis.__IKNOWUR_MEMORY_STORE__) {
       globalThis.__IKNOWUR_MEMORY_STORE__ = { parties: {} };
     }
     return globalThis.__IKNOWUR_MEMORY_STORE__;
   }
 
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(STORE_FILE)) {
-    const initial = { parties: {} };
-    fs.writeFileSync(STORE_FILE, JSON.stringify(initial, null, 2), "utf8");
-    return initial;
-  }
-
   try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(STORE_FILE)) {
+      const initial = { parties: {} };
+      fs.writeFileSync(STORE_FILE, JSON.stringify(initial, null, 2), "utf8");
+      return initial;
+    }
+
     const raw = fs.readFileSync(STORE_FILE, "utf8");
     const parsed = JSON.parse(raw);
     if (!parsed.parties || typeof parsed.parties !== "object") {
@@ -49,18 +49,29 @@ function loadStore() {
     }
     return parsed;
   } catch (err) {
-    console.error("store load failed:", err);
-    return { parties: {} };
+    // Fallback for read-only/runtime-restricted environments.
+    console.error("store load failed; falling back to memory store:", err);
+    useFileStore = false;
+    if (!globalThis.__IKNOWUR_MEMORY_STORE__) {
+      globalThis.__IKNOWUR_MEMORY_STORE__ = { parties: {} };
+    }
+    return globalThis.__IKNOWUR_MEMORY_STORE__;
   }
 }
 
 function saveStore() {
-  if (!USE_FILE_STORE) {
+  if (!useFileStore) {
     globalThis.__IKNOWUR_MEMORY_STORE__ = store;
     return;
   }
 
-  fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2), "utf8");
+  try {
+    fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2), "utf8");
+  } catch (err) {
+    console.error("store save failed; switching to memory store:", err);
+    useFileStore = false;
+    globalThis.__IKNOWUR_MEMORY_STORE__ = store;
+  }
 }
 
 function now() {

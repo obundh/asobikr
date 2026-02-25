@@ -7,6 +7,9 @@
   },
   "rewrites": [
     { "source": "/api", "destination": "/api/index.js" },
-    { "source": "/api/(.*)", "destination": "/api/index.js" }
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/iknowur", "destination": "/iknowur/index.html" },
+    { "source": "/gussmymbti", "destination": "/gussmymbti/index.html" }
   ]
 }
